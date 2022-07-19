@@ -42,6 +42,14 @@ def channel_shuffle(x, groups=2):   ##shuffle channel
         out = x.view(B, groups, C // groups, H, W).permute(0, 2, 1, 3, 4).contiguous()
         out=out.view(B, C, H, W) 
         return out
+
+class ReOrg(nn.Module):
+    def __init__(self):
+        super(ReOrg, self).__init__()
+
+    def forward(self, x):  # x(b,c,w,h) -> y(b,4c,w/2,h/2)
+        return torch.cat([x[..., ::2, ::2], x[..., 1::2, ::2], x[..., ::2, 1::2], x[..., 1::2, 1::2]], 1)
+
         
 class MP(nn.Module):
     def __init__(self, k=2):
